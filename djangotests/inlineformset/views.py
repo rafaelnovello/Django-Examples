@@ -10,17 +10,22 @@ from django.forms.models import modelformset_factory
 
 
 def manage_authors(request):
-    AuthorFormSet = modelformset_factory(Author, can_delete=True)
+    AuthorFormSet = modelformset_factory(Author, can_delete=True, extra=0)
     if request.method == 'POST':
-        formset = AuthorFormSet(request.POST, request.FILES)
-        if formset.is_valid():
-            formset.save()
-            # do something.
+        if 'add_author' in request.POST:
+            cp = request.POST.copy()
+            cp['form-TOTAL_FORMS'] = int(cp['form-TOTAL_FORMS']) + 1
+            formset = AuthorFormSet(cp)
+        elif 'submit' in request.POST:
+            formset = AuthorFormSet(request.POST, request.FILES)
+            if formset.is_valid():
+                formset.save()
+                # do something.
     else:
         formset = AuthorFormSet()
-    return render_to_response("manage_authors.html", {
-        "formset": formset,
-    })
+    return render_to_response("manage_authors.html",
+        {"formset": formset},
+         RequestContext(request))
 
 
 def add_books(request, author_id):
