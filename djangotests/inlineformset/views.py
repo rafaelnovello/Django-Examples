@@ -1,6 +1,6 @@
 #coding:utf-8
 
-from models import Author, Book
+from models import Author, Book, AuthorForm
 
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
@@ -45,4 +45,28 @@ def add_books(request, author_id):
         formset = BookInlineFormSet(instance=author)
     return render_to_response("inline.html",
         {"formset": formset},
+        RequestContext(request))
+
+
+def add_author_and_books(request):
+    BookInlineFormSet = inlineformset_factory(Author, Book, extra=0)
+    if request.method == "POST":
+        form = AuthorForm(request.POST, request.FILES)
+        if 'add_title' in request.POST:
+            cp = request.POST.copy()
+            cp['book_set-TOTAL_FORMS'] = int(cp['book_set-TOTAL_FORMS']) + 1
+            formset = BookInlineFormSet(cp)
+        elif 'submit' in request.POST:
+            if form.is_valid():
+                author = form.save()
+            formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
+            if formset.is_valid():
+                formset.save()
+                return HttpResponseRedirect('/inlines/author/%s/books/add/' % author.id)
+    else:
+        form = AuthorForm()
+        formset = BookInlineFormSet()
+    return render_to_response("inline.html",
+        {"formset": formset,
+        "author_form": form},
         RequestContext(request))

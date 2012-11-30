@@ -1,6 +1,8 @@
 
 <form method="post" action="">
 {% csrf_token %}
+    {{ author_form }}
+    {{ formset.instance.name }}<br>
     {{ formset.management_form }}
     {% for form in formset.forms %}
         {{ form }}

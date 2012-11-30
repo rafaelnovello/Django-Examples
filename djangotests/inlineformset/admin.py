@@ -12,5 +12,6 @@ class AuthorAdmin(admin.ModelAdmin):
     inlines = [
         BookInline,
     ]
+    list_display = ('name',)
 
 admin.site.register(Author, AuthorAdmin)
