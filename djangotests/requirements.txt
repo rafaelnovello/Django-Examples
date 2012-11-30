@@ -1,0 +1,4 @@
+south
+django-nose
+python-dateutil
+django-debug-toolbar
