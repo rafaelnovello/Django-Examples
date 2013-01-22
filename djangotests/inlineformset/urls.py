@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('inlineformset',
-    url(r'^author/(?P<author_id>\d+)/books/add/$', 'views.add_books'),
-    url(r'^author/add/$', 'views.manage_authors'),
-    url(r'^author/books/add/$', 'views.add_author_and_books'),
+    url(r'^$', 'views.authors_list'),
+    url(r'^author/add/$', 'views.author_add'),
+    url(r'^author/edit/(?P<pk>\d+)$', 'views.author_edit'),
+    url(r'^author/delete/(?P<pk>\d+)$', 'views.author_delete'),
 )

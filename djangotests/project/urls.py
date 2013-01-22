@@ -4,7 +4,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns('django.views.generic.simple',
+    url(r'^$', 'direct_to_template', {'template': 'home.html'}),
     url(r'^inlines/', include('inlineformset.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )

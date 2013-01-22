@@ -6,67 +6,41 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.forms.models import inlineformset_factory
-from django.forms.models import modelformset_factory
+from django.views.generic.list_detail import object_list
 
 
-def manage_authors(request):
-    AuthorFormSet = modelformset_factory(Author, can_delete=True, extra=0)
-    if request.method == 'POST':
-        if 'add_author' in request.POST:
-            cp = request.POST.copy()
-            cp['form-TOTAL_FORMS'] = int(cp['form-TOTAL_FORMS']) + 1
-            formset = AuthorFormSet(cp)
-        elif 'submit' in request.POST:
-            formset = AuthorFormSet(request.POST, request.FILES)
-            if formset.is_valid():
-                formset.save()
-                # do something.
-    else:
-        formset = AuthorFormSet()
+def authors_list(request):
+    authors = Author.objects.all()
+    return object_list(request, queryset=authors, template_name="author_list.html")
+
+
+def author_delete(request, pk):
+    Author.objects.get(pk=pk).delete()
+    return HttpResponseRedirect('/inlines/')
+
+
+def author_add(request):
+    author = Author()
+    return author_manager(request, author)
+
+
+def author_edit(request, pk):
+    author = Author.objects.get(pk=pk)
+    return author_manager(request, author)
+
+
+def author_manager(request, author):
+    BookInlineFormSet = inlineformset_factory(Author, Book, extra=1)
+
+    form = AuthorForm(request.POST or None, instance=author)
+    formset = BookInlineFormSet(request.POST or None, instance=author)
+
+    if form.is_valid() and formset.is_valid():
+        form.save()
+        formset.save()
+        return HttpResponseRedirect('/inlines/')
+
     return render_to_response("manage_authors.html",
-        {"formset": formset},
-         RequestContext(request))
-
-
-def add_books(request, author_id):
-    author = Author.objects.get(pk=author_id)
-    BookInlineFormSet = inlineformset_factory(Author, Book, extra=0)
-    if request.method == "POST":
-        if 'add_title' in request.POST:
-            cp = request.POST.copy()
-            cp['book_set-TOTAL_FORMS'] = int(cp['book_set-TOTAL_FORMS']) + 1
-            formset = BookInlineFormSet(cp, instance=author)
-        elif 'submit' in request.POST:
-            formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
-            if formset.is_valid():
-                formset.save()
-                return HttpResponseRedirect('/inlines/author/1/books/add/')
-    else:
-        formset = BookInlineFormSet(instance=author)
-    return render_to_response("inline.html",
-        {"formset": formset},
-        RequestContext(request))
-
-
-def add_author_and_books(request):
-    BookInlineFormSet = inlineformset_factory(Author, Book, extra=0)
-    if request.method == "POST":
-        form = AuthorForm(request.POST, request.FILES)
-        if 'add_title' in request.POST:
-            cp = request.POST.copy()
-            cp['book_set-TOTAL_FORMS'] = int(cp['book_set-TOTAL_FORMS']) + 1
-            formset = BookInlineFormSet(cp)
-        elif 'submit' in request.POST:
-            if form.is_valid():
-                author = form.save()
-            formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
-            if formset.is_valid():
-                formset.save()
-                return HttpResponseRedirect('/inlines/author/%s/books/add/' % author.id)
-    else:
-        form = AuthorForm()
-        formset = BookInlineFormSet()
-    return render_to_response("inline.html",
         {"formset": formset,
-        "author_form": form},
+        "form": form},
         RequestContext(request))

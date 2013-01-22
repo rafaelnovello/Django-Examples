@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Lista de Autores</h3>
+<p class="pull-right"><a href="author/add" class="btn btn-primary">Adicionar</a></p>
+<table class="table table-hover table-bordered table-striped">
+    <thead>
+        <tr class="info">
+            <th class="info">ID</th>
+            <th class="info">Nome</th>
+            <th class="info">Qtd de livros</th>
+            <th class="info">Deletar?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for author in object_list %}
+        <tr>
+            <td>{{ author.id }}</td>
+            <td><a href="author/edit/{{ author.id }}">{{ author.name }}</a></td>
+            <td>{{ author.book_set.count }}</td>
+            <td><a href="author/delete/{{ author.id }}">Deletar este</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

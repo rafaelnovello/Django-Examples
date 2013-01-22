@@ -104,7 +104,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'project.urls'
@@ -123,14 +123,21 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_forms_bootstrap',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'inlineformset',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    # 'debug_toolbar',
+    'debug_toolbar',
     # 'south',
 )
+
+INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+    #'HIDE_DJANGO_SQL': False,
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
