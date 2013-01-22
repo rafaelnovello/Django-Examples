@@ -30,7 +30,8 @@ def author_edit(request, pk):
 
 
 def author_manager(request, author):
-    BookInlineFormSet = inlineformset_factory(Author, Book, extra=1)
+    BookInlineFormSet = inlineformset_factory(Author, Book, extra=1,
+                                              formfield_callback=add_category)
 
     form = AuthorForm(request.POST or None, instance=author)
     formset = BookInlineFormSet(request.POST or None, instance=author)
@@ -44,3 +45,15 @@ def author_manager(request, author):
         {"formset": formset,
         "form": form},
         RequestContext(request))
+
+
+def add_category(field, **kwargs):
+        if field.name == 'category':
+            additional_choices = [
+                    ('best_seller', 'Best Seller'),
+                    ('self_help', 'Auto Ajuda')
+                ]
+            for choice in additional_choices:
+                if not choice in field.choices:
+                    field.choices.extend(additional_choices)
+        return field.formfield(**kwargs)
